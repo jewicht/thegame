@@ -38,9 +38,6 @@ class TheGame:
         logging.debug("%6s %6s %6s %6s %6s" % ("STACK", "UP", "UP", "DOWN", "DOWN"))
         string = "%6d" % len(self.pile)
         
-        # for player in players:
-        #     print("%6d" % len(player._cards), end=" ")
-        
         for s in self.stacks:
             string += "%6d" % s[-1]
         logging.debug(string)

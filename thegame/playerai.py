@@ -104,7 +104,6 @@ class SimplePlayer(AbsPlayer):
         tencards = self.findtencards()
         if len(tencards) > 0:
             for tencard in tencards:
-                #print("ten rule mother fucker")
                 self.playthiscard(tencard[0], tencard[1])
                 return 1
 
