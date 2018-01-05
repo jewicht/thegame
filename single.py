@@ -3,6 +3,8 @@ from __future__ import print_function
 import sys
 
 from thegame.thegame import TheGame
+from thegame.playerai import SimplePlayer
+
 import logging        
     
 def main():
@@ -16,7 +18,7 @@ def main():
     
     nplayers = int(sys.argv[1])
 
-    thegame = TheGame(nplayers)
+    thegame = TheGame(SimplePlayer, nplayers)
     thegame.play()
 
     

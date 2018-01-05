@@ -5,9 +5,17 @@ import logging
 
 import numpy as np
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
+
+from functools import partial
 
 from thegame.thegame import TheGame
-    
+from thegame.playerai import SimplePlayer
+
+def g(playerclass, nplayers, x):
+    tg = TheGame(playerclass, nplayers)
+    return tg.play()
+
 def main():
 
     if len(sys.argv) != 3:
@@ -19,12 +27,10 @@ def main():
     nplayers = int(sys.argv[1])
     ngames = int(sys.argv[2])
 
-    vec = np.empty(ngames)
-    for cnt in range(ngames):
-        thegame = TheGame(nplayers)
-        r = thegame.play()
-        vec[cnt] = r
-
+    f = partial(g, SimplePlayer, nplayers)
+    p = Pool()
+    vec = np.array(p.map(f, range(ngames)))
+    
     vicperc = 100.* np.sum(vec == 0) / ngames
     print("%.1f%% of games won" %  vicperc)
     

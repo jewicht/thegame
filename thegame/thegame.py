@@ -3,43 +3,52 @@ from __future__ import print_function, absolute_import
 from random import shuffle
 import logging
 
-from thegame.playerai import SimplePlayer
+from thegame.playerai import AbsPlayer
 
 
 class TheGame:
 
-    def __init__(self, nplayers):
-        self.nplayers = nplayers
+    def __init__(self, playerclass, nplayers):
+
+        if not issubclass(playerclass, AbsPlayer):
+            raise Exception("Not a valid player")
+
+        nplayers = int(nplayers)
+        if nplayers <=0:
+            raise Exception("Invalid number of players")
         
         self.ncards = 7
         self.nobligplay = 2
         
 
-        self.cards = list(range(1, 100))
-        shuffle(self.cards)
+        self.pile = list(range(1, 100))
+        shuffle(self.pile)
 
         self.stacks = [[0], [0], [100], [100]]
-        self.warn = [None, None, None, None]       
+        self.wstacks = [-1, -1, -1, -1]
 
         self.players = []
-        for i in range(self.nplayers):
-            player = SimplePlayer(i)
-            player.pickcards(self.cards, self.ncards)
+        for i in range(nplayers):
+            player = playerclass(i, self.pile, self.stacks, self.wstacks)
+            player.pickcards(self.ncards)
             self.players.append(player)
 
 
     def display(self):
-        logging.debug("%5s %5s %5s %5s %5s" % ("STACK", "UP", "UP", "DOWN", "DOWN"))
-        string = "%5d" % len(self.cards)
+        logging.debug("%6s %6s %6s %6s %6s" % ("STACK", "UP", "UP", "DOWN", "DOWN"))
+        string = "%6d" % len(self.pile)
         
         # for player in players:
-        #     print("%5d" % len(player._cards), end=" ")
+        #     print("%6d" % len(player._cards), end=" ")
         
         for s in self.stacks:
-            string += "%5d" % s[-1]
-
+            string += "%6d" % s[-1]
         logging.debug(string)
-            
+
+        string = "%6s" % ""
+        for w in self.wstacks:
+            string += "%6d" % w
+        logging.debug(string)
 
             
     def play(self):
@@ -51,7 +60,7 @@ class TheGame:
             for cnt, player in enumerate(self.players):
                 logging.debug(player.name)
                 nplay = 0 
-                while player.play(self.stacks, nplay < self.nobligplay) != 0:
+                while player.play(nplay < self.nobligplay) != 0:
 
                     #other players can look at the board and warn
                     for cnt2, player2 in enumerate(self.players):
@@ -62,9 +71,9 @@ class TheGame:
                     nplay += 1
                     thisround += 1
 
-                player.pickcards(self.cards, nplay)
+                player.pickcards(nplay)
 
-            cardsingame = len(self.cards)
+            cardsingame = len(self.pile)
             for player in self.players:
                 cardsingame += len(player.cards)
 
@@ -78,7 +87,7 @@ class TheGame:
             #nobody could play, defeat
             if thisround == 0:
                 logging.debug("\n\nYou lost")
-                logging.debug("%d card(s) left in the stack" % len(self.cards))
+                logging.debug("%d card(s) left in the stack" % len(self.pile))
                 for player in self.players:
                     logging.debug("%s has %d cards left" % (player.name, len(player.cards)))
                 return cardsingame
