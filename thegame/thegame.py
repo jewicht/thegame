@@ -14,10 +14,17 @@ class TheGame:
             raise Exception("Not a valid player")
 
         nplayers = int(nplayers)
-        if nplayers <=0:
+        if nplayers <= 0 or nplayers > 5:
             raise Exception("Invalid number of players")
-        
-        self.ncards = 7
+
+
+        if nplayers == 1:
+            self.ncards = 8
+        elif nplayers == 2:
+            self.ncards = 7
+        else:
+            self.ncards = 6
+
         self.nobligplay = 2
         
 
@@ -35,7 +42,7 @@ class TheGame:
 
 
     def display(self):
-        logging.debug("%6s %6s %6s %6s %6s" % ("STACK", "UP", "UP", "DOWN", "DOWN"))
+        logging.debug("%6s %6s %6s %6s %6s" % ("PILE", "UP", "UP", "DOWN", "DOWN"))
         string = "%6d" % len(self.pile)
         
         for s in self.stacks:
@@ -74,6 +81,9 @@ class TheGame:
             for player in self.players:
                 cardsingame += len(player.cards)
 
+            #empty pile
+            if len(self.pile) == 0:
+                self.nobligplay = 1
 
             #victory
             if cardsingame == 0:
@@ -84,7 +94,7 @@ class TheGame:
             #nobody could play, defeat
             if thisround == 0:
                 logging.debug("\n\nYou lost")
-                logging.debug("%d card(s) left in the stack" % len(self.pile))
+                logging.debug("%d card(s) left in the pile" % len(self.pile))
                 for player in self.players:
                     logging.debug("%s has %d cards left" % (player.name, len(player.cards)))
                 return cardsingame

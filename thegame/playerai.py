@@ -34,7 +34,7 @@ class AbsPlayer(object, with_metaclass(ABCMeta)):
             if len(self._pile) == 0:
                 return
             self._cards.append(self._pile.pop())
-            sorted(self._cards)
+            #sorted(self._cards)
 
     @abstractmethod
     def play(self, mandatory):
